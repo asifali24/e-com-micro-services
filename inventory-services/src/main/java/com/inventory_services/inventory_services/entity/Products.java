@@ -17,7 +17,7 @@ public class Products {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID id;
+    private UUID id;
 
     private String title;
 
