@@ -6,6 +6,7 @@ import com.inventory_services.inventory_services.dto.ProductDto;
 import com.inventory_services.inventory_services.entity.Products;
 import com.inventory_services.inventory_services.repository.ProductsRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -31,6 +32,7 @@ public class ProductsServices {
     }
 
     @Transactional
+    @RateLimiter(name = "stockReduction", fallbackMethod = "reduceStocksFallback")
     @CircuitBreaker(name = "inventoryDatabase", fallbackMethod = "reduceStocksFallback")
     public Double reduceStocks(OrderRequestDto orderRequestDto) {
         long startedAt = System.nanoTime();

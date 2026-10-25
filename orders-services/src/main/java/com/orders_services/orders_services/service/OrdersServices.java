@@ -8,6 +8,7 @@ import com.orders_services.orders_services.entity.OrdersItems;
 import com.orders_services.orders_services.enums.OrderStatus;
 import com.orders_services.orders_services.repository.OrdersRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ public class OrdersServices {
     private final OrdersRepository ordersRepository;
     private final InventoryFeignClient inventoryFeignClient;
 
+    @RateLimiter(name = "orderCreation", fallbackMethod = "createOrderFallback")
     @CircuitBreaker(name = "inventoryService", fallbackMethod = "createOrderFallback")
     public OrderRequestDto createOrder(OrderRequestDto orderRequestDto) {
         long startedAt = System.nanoTime();

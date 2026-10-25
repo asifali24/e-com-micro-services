@@ -24,6 +24,12 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
 
 resilience4j:
+  ratelimiter:
+    instances:
+      stockReduction:
+        limit-refresh-period: 1s
+        limit-for-period: 100
+        timeout-duration: 10ms
   circuitbreaker:
     instances:
       inventoryDatabase:

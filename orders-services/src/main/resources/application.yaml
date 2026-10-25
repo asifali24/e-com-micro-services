@@ -32,6 +32,12 @@ eureka:
     prefer-ip-address: true
 
 resilience4j:
+  ratelimiter:
+    instances:
+      orderCreation:
+        limit-refresh-period: 1s
+        limit-for-period: 100
+        timeout-duration: 10ms
   circuitbreaker:
     instances:
       inventoryService:
