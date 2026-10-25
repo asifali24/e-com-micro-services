@@ -7,8 +7,11 @@ import com.orders_services.orders_services.entity.Orders;
 import com.orders_services.orders_services.entity.OrdersItems;
 import com.orders_services.orders_services.enums.OrderStatus;
 import com.orders_services.orders_services.repository.OrdersRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,10 +27,15 @@ public class OrdersServices {
     private final OrdersRepository ordersRepository;
     private final InventoryFeignClient inventoryFeignClient;
 
+    @CircuitBreaker(name = "inventoryService", fallbackMethod = "createOrderFallback")
     public OrderRequestDto createOrder(OrderRequestDto orderRequestDto) {
+        long startedAt = System.nanoTime();
         validateOrder(orderRequestDto);
+        log.info("Creating order with {} item(s)", orderRequestDto.getItems().size());
 
+        log.info("Requesting stock reduction from inventory service");
         Double totalPrice = inventoryFeignClient.reduceStocks(orderRequestDto);
+        log.info("Inventory stock reduction completed; calculated total price: {}", totalPrice);
         Orders order = new Orders();
         order.setOrderStatus(OrderStatus.APPROVED);
         order.setTotalPrice(BigDecimal.valueOf(totalPrice));
@@ -42,7 +50,18 @@ public class OrdersServices {
         }
         order.setOrdersItems(items);
 
-        return toDto(ordersRepository.save(order));
+        OrderRequestDto savedOrder = toDto(ordersRepository.save(order));
+        long durationMs = (System.nanoTime() - startedAt) / 1_000_000;
+        log.info("Order created successfully with id: {} in {} ms", savedOrder.getId(), durationMs);
+        return savedOrder;
+    }
+
+    public OrderRequestDto createOrderFallback(OrderRequestDto orderRequestDto, Throwable throwable) {
+        log.error("Inventory service unavailable while creating order", throwable);
+        throw new ResponseStatusException(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Inventory service is temporarily unavailable"
+        );
     }
 
     public List<OrderRequestDto> getAllOrders() {
