@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -21,7 +22,7 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    private Integer totalPrice;
+    private BigDecimal totalPrice;
 
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<OrdersItems> ordersItems;

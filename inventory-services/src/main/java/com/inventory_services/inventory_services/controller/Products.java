@@ -1,6 +1,7 @@
 package com.inventory_services.inventory_services.controller;
 
 
+import com.inventory_services.inventory_services.dto.OrderRequestDto;
 import com.inventory_services.inventory_services.dto.ProductDto;
 import com.inventory_services.inventory_services.service.ProductsServices;
 
@@ -9,6 +10,8 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
@@ -27,6 +30,11 @@ public class Products {
     @GetMapping
     public ResponseEntity<List<ProductDto>> getAllProducts(){
         return ResponseEntity.ok(productsServices.getAllProducts());
+    }
+
+    @PutMapping("/reduce-stocks")
+    public ResponseEntity<Double> reduceStocks(@RequestBody OrderRequestDto orderRequestDto) {
+        return ResponseEntity.ok(productsServices.reduceStocks(orderRequestDto));
     }
 
 
