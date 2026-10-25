@@ -35,5 +35,11 @@ public class OrdersControllers {
         return ResponseEntity.ok(ordersServices.getOrdersById(id));
     }
 
+    @GetMapping("/test-discovery-client")
+    public String test(){
+        return "Testing Discovery & rest client";
+
+    }
+
 
 }
