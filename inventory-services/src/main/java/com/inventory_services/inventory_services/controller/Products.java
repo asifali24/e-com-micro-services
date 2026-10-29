@@ -40,9 +40,9 @@ public class Products {
 
     @GetMapping("/test-discovery-client")
     public String test(){
-        ServiceInstance instance = discoveryClient.getInstances("orders-services").getFirst();
+        ServiceInstance instance = discoveryClient.getInstances("api-gateway").getFirst();
         return restClient.get()
-                .uri(instance.getUri()+"/orders/test-discovery-client")
+                .uri(instance.getUri()+"/api/v1/orders/test-discovery-client")
                 .retrieve()
                 .body(String.class);
 

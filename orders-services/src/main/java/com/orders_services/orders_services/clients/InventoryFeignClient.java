@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "inventory-services", path = "/products")
+@FeignClient(name = "api-gateway", path = "/api/v1/inventory/products")
 public interface InventoryFeignClient {
 
     @PutMapping("/reduce-stocks")
